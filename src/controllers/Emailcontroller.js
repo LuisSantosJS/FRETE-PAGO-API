@@ -26,8 +26,8 @@ module.exports = {
         const options = {
             from: 'luis@roxytech.com.br',
             to: `${email}`,
-            subject: 'CÃ³digo de acesso',
-            text: `cÃ³digo ${code.toUpperCase()}`
+            subject: 'Código de acesso',
+            text: `Código: ${code.toUpperCase()}`
         };
         transporter.sendMail(options, function (error, info) {
             if (error) {
