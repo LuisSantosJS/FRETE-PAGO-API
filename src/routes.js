@@ -1,6 +1,6 @@
 const express = require('express');
 const EmailController = require('./controllers/Emailcontroller');
-const UserController = require('./controllers/UserController');
+const UserController = require('./controllers/UserTruckController');
 
 const routes = express.Router();
 
@@ -9,6 +9,7 @@ const routes = express.Router();
 routes.get('/users/index', UserController.index);
 routes.post('/users/create', UserController.create);
 routes.post('/users/validate', UserController.valid);
+routes.post('/users/login', UserController.login);
 
 routes.get('/', (req, res) => res.send('VAZA'));
 
