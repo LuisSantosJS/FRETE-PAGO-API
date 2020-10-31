@@ -8,7 +8,7 @@ exports.up = async (knex) => {
         table.string('telefone', 255).notNullable();
         table.string('CPF', 255).notNullable();
         table.string('dateOfBirth', 255).notNullable();
-        table.string('BankNumber', 255).notNullable();
+        table.string('bankNumber', 255).notNullable();
         table.string('typeBank', 255).notNullable();
         table.string('agency', 255).notNullable();
         table.string('account', 255).notNullable();

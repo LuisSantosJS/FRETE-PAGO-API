@@ -22,7 +22,7 @@ module.exports = {
         if (valueBcrypt == false) {
             return res.json({ message: 'error', res: 'Invalid code' })
         }
-        const value = CreateToken(email, KeySecret, 7200);
+        const value = CreateToken(String(email).toLowerCase(), KeySecret, 7200);
         if (value.message == 'error') {
             return res.json({ message: 'error', res: 'Failed to create token' })
         }
@@ -53,15 +53,19 @@ module.exports = {
         if (validationValue.message === 'error') {
             return res.json(validationValue);
         }
-        const checkUser = await knex('usersTruck').where('email', email).select('*');
+        const checkUser = await knex('usersTruck').where('email', String(email).toLowerCase()).select('*');
         if (checkUser.length !== 0) {
-            return res.status(200).json({ message: 'error', res: 'Account already created or under review' })
+            return res.status(200).json({ message: 'error', res: 'Account already created or under review | This email has already been registered' })
+        }
+        const checkUser2 = await knex('usersTruck').where('CPF', String(CPF)).select('*');
+        if (checkUser2.length !== 0) {
+            return res.status(200).json({ message: 'error', res: 'Account already created or under review | This CPF has already been registered' })
         }
         var salt = bcrypt.genSaltSync(10);
         var hashPassword = bcrypt.hashSync(password, salt);
         knex('usersTruck').insert([{
             name,
-            email,
+            email: String(email).toLowerCase(),
             password: hashPassword,
             telefone,
             CPF,
@@ -94,19 +98,54 @@ module.exports = {
         if (!password) {
             return res.status(200).json({ message: 'error', res: 'Missing the password' })
         }
-        const checkUser = await knex('usersTruck').where('email', email).select('*');
+        const checkUser = await knex('usersTruck').where('email', String(email).toLowerCase()).select('*');
         if (checkUser.length === 0) {
             return res.status(200).json({ message: 'error', res: 'Non-existent user' })
+        }
+        if (String(checkUser[0].status) === 'pending') {
+            return res.status(200).json({ message: 'error', res: 'User in evaluation or waiting | Usuário em avaliação ou em espera' })
         }
         const valueVlidPassword = bcrypt.compareSync(password, checkUser[0].password);
         if (!valueVlidPassword) {
             return res.status(200).json({ message: 'error', res: 'Invalid password' })
         }
-        const token = CreateToken(email, KeySecret, 0);
-        if(token.message === 'error'){
+        const token = CreateToken(String(email).toLowerCase(), KeySecret, 0);
+        if (token.message === 'error') {
             return res.status(200).json({ message: 'error', res: token.res })
         }
         return res.status(200).json({ message: 'success', token: token.token, data: checkUser[0] })
+    },
+    async showStatusUserTruck(req, res) {
+        const { email } = req.query;
+        if (!email) {
+            return { message: 'error', res: 'Missing the email' }
+        }
+        const userCheck = await knex('usersTruck').where('email', String(email).toLowerCase()).select('usersTruck.status');
+        if (userCheck.length === 0) {
+            return res.status(200).json({ message: 'error', res: 'Non-existent user' })
+        }
+        return res.status(200).json({ message: 'success', status: userCheck[0].status })
+    },
+    async updateStatusUserTruck(req, res) {
+        const token = req.headers['x-access-token'];
+        const { email, status } = req.body;
+        const value = ValidateToken(token, KeySecret).message;
+        if (value === 'error') {
+            return res.status(200).json({ message: 'error', res: 'Failed to authenticate' })
+        }
+        if (!status) {
+            return res.status(200).json({ message: 'error', res: 'Missing the status' })
+        }
+        if ((status !== 'pending') && (status !== 'active')) {
+            return res.status(200).json({ message: 'error', res: 'Invalid state type! (valid: active, pending)' })
+        }
+        knex('usersTruck').where('email', String(email).toLowerCase()).update({
+            status: String(status)
+        }).then(() => {
+            return res.status(200).json({ message: 'success', res: `User status changed to ${status}` })
+        }).catch((err) => {
+            return res.status(200).json({ message: 'error', res: err })
+        })
     }
 }
 

@@ -6,10 +6,13 @@ const routes = express.Router();
 
 
 
-routes.get('/users/index', UserController.index);
-routes.post('/users/create', UserController.create);
-routes.post('/users/validate', UserController.valid);
-routes.post('/users/login', UserController.login);
+routes.get('/truck/users/index', UserController.index);
+routes.post('/truck/users/create', UserController.create);
+routes.post('/truck/users/validate', UserController.valid);
+routes.post('/truck/users/login', UserController.login);
+routes.get('/truck/users/status', UserController.showStatusUserTruck);
+
+routes.post('/truck/users/status/update', UserController.updateStatusUserTruck);
 
 routes.get('/', (req, res) => res.send('VAZA'));
 
