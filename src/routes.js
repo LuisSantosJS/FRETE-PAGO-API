@@ -1,10 +1,11 @@
 const express = require('express');
 const EmailController = require('./controllers/Emailcontroller');
 const UserController = require('./controllers/UserTruckController');
-
+const SecureController = require('./controllers/SecureController');
 const routes = express.Router();
 
-
+routes.get('/app/status', SecureController.index)
+routes.post('/app/status/update', SecureController.update)
 
 routes.get('/truck/users/index', UserController.index);
 routes.post('/truck/users/create', UserController.create);
