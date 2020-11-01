@@ -8,7 +8,7 @@ const port = process.env.PORT || 3333;
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({limit: '30mb', extended: true}));
 const server = http.createServer(app)
 const io = IO.listen(server);
 

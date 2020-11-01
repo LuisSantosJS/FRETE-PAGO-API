@@ -12,7 +12,7 @@ routes.post('/truck/users/create', UserController.create);
 routes.post('/truck/users/validate', UserController.valid);
 routes.post('/truck/users/login', UserController.login);
 routes.get('/truck/users/status', UserController.showStatusUserTruck);
-
+routes.post('/truck/users/avatar/update', UserController.updateProfileAvatar);
 routes.post('/truck/users/status/update', UserController.updateStatusUserTruck);
 
 routes.get('/', (req, res) => res.send('VAZA'));

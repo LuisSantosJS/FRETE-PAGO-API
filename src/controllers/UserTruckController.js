@@ -76,6 +76,7 @@ module.exports = {
             account,
             nameAccount,
             accountCPF,
+            avatar: '',
             vehicleModel,
             vehiclePlate,
             numberRNTRC,
@@ -143,6 +144,27 @@ module.exports = {
             status: String(status)
         }).then(() => {
             return res.status(200).json({ message: 'success', res: `User status changed to ${status}` })
+        }).catch((err) => {
+            return res.status(200).json({ message: 'error', res: err })
+        })
+    },
+    async updateProfileAvatar(req, res) {
+        const { avatar, email } = req.body;
+        const token = req.headers['x-access-token'];
+        const value = ValidateToken(token, KeySecret).message;
+        if (value === 'error') {
+            return res.status(200).json({ message: 'error', res: 'Failed to authenticate' })
+        }
+        if (!avatar) {
+            return res.status(200).json({ message: 'error', res: 'Missing the avatar' })
+        }
+        if (!email) {
+            return res.status(200).json({ message: 'error', res: 'Missing the email' })
+        }
+        knex('usersTruck').where('email', String(email).toLowerCase()).update({
+            avatar: avatar
+        }).then(() => {
+            return res.status(200).json({ message: 'success', res: 'Image updated successfully' })
         }).catch((err) => {
             return res.status(200).json({ message: 'error', res: err })
         })

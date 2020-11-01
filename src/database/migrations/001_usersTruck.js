@@ -12,6 +12,7 @@ exports.up = async (knex) => {
         table.string('typeBank', 255).notNullable();
         table.string('agency', 255).notNullable();
         table.string('account', 255).notNullable();
+        table.text('avatar', 'longtext').notNullable();
         table.string('nameAccount', 255).notNullable();
         table.string('accountCPF', 255).notNullable();
         table.string('vehicleModel', 255).notNullable();
