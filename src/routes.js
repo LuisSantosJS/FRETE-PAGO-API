@@ -6,9 +6,9 @@ const routes = express.Router();
 
 routes.get('/app/status', SecureController.index)
 routes.post('/app/status/update', SecureController.update)
-
 routes.get('/truck/users/index', UserController.index);
 routes.post('/truck/users/create', UserController.create);
+routes.post('/truck/users/update', UserController.updateProfileUserTruck);
 routes.post('/truck/users/validate', UserController.valid);
 routes.post('/truck/users/login', UserController.login);
 routes.get('/truck/users/status', UserController.showStatusUserTruck);

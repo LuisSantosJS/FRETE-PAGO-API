@@ -3,6 +3,7 @@ const knex = require('../database/connection');
 const bcrypt = require('bcryptjs');
 const ValidateToken = require('../jwt/validate');
 const CreateToken = require('../jwt/create');
+const UpdateUsersTruck = require('../validateForms/UpdateUsersTruck');
 const CreateUsersTruck = require('../validateForms/CreateUsersTruck');
 const KeySecret = 'secreto';
 module.exports = {
@@ -167,6 +168,79 @@ module.exports = {
             return res.status(200).json({ message: 'success', res: 'Image updated successfully' })
         }).catch((err) => {
             return res.status(200).json({ message: 'error', res: err })
+        })
+    },
+    async updateProfileUserTruck(req, res) {
+        const token = req.headers['x-access-token'];
+        const value = ValidateToken(token, KeySecret).message;
+        if (value === 'error') {
+            return res.status(200).json({ message: 'error', res: 'Failed to authenticate' })
+        }
+        const validationValue = UpdateUsersTruck(req.body);
+        if (validationValue.message === 'error') {
+            return res.status(200).json(validationValue);
+        }
+        const {
+            name,
+            email,
+            password,
+            isNewPassword,
+            telefone,
+            dateOfBirth,
+            bankNumber,
+            typeBank,
+            agency,
+            account,
+            nameAccount,
+            accountCPF,
+            vehicleModel,
+            vehiclePlate,
+            numberRNTRC,
+            bodywork,
+            bodyworkType,
+            numberCNH,
+        } = req.body;
+        const dataNotNewPassword = {
+            name,
+            telefone,
+            dateOfBirth,
+            bankNumber,
+            typeBank,
+            agency,
+            account,
+            nameAccount,
+            accountCPF,
+            vehicleModel,
+            vehiclePlate,
+            numberRNTRC,
+            bodywork,
+            bodyworkType,
+            numberCNH,
+        }
+        var salt = bcrypt.genSaltSync(10);
+        var hashPassword = bcrypt.hashSync(password, salt);
+        const dataNewPassword = {
+            name,
+            password: hashPassword,
+            telefone,
+            dateOfBirth,
+            bankNumber,
+            typeBank,
+            agency,
+            account,
+            nameAccount,
+            accountCPF,
+            vehicleModel,
+            vehiclePlate,
+            numberRNTRC,
+            bodywork,
+            bodyworkType,
+            numberCNH,
+        }
+        knex('usersTruck').where('email', email).update(String(isNewPassword) === 'true' ? dataNewPassword : dataNotNewPassword).then(() => {
+            return res.status(200).json({ message: 'success', res: 'User information updated successfully! | Informações de usuário atualizadas com sucesso!' })
+        }).catch(err => {
+            return res.status(200).json({ message: 'error', res: 'An error occurred while trying to update user information! | Ocorreu um erro ao tentar atualizar informações de usuário!', error: err })
         })
     }
 }
